@@ -20,7 +20,7 @@ def build_file_index(root):
     if not os.path.exists(root):
         raise FileNotFoundError(f"Root path does not exist: {root}")
 
-    for folder in os.listdir(root):
+    for folder in sorted(os.listdir(root)):
         folder_path = os.path.join(root, folder)
 
         if not os.path.isdir(folder_path):
@@ -32,7 +32,7 @@ def build_file_index(root):
         label = parts[0]
         city = parts[-1]
 
-        for file in os.listdir(folder_path):
+        for file in sorted(os.listdir(folder_path)):
             if file.endswith(".csv"):
                 rows.append({
                     "folder": folder,
@@ -43,6 +43,12 @@ def build_file_index(root):
                 })
 
     df_index = pd.DataFrame(rows)
+
+    if not df_index.empty:
+        df_index = df_index.sort_values(
+            by=["city", "label", "folder", "file"]
+        ).reset_index(drop=True)
+
     return df_index
 
 
